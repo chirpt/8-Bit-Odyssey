@@ -108,7 +108,13 @@ def run_level(level, level_folder_name, display):
     return level, level_folder_name, display
 
 def process_game_events(pg_events, level, level_folder_name, display, HUD):
+    level = apply_player_motion(pg_events, level)
 
+
+    return level, level_folder_name, display, HUD
+
+def apply_player_motion(pg_events, level):
+    
     user_acceleration = False
     if pg_events["keys_pressed"][pygame.K_d]:
         if level.player.max_world_velocity[0] > abs(level.player.world_velocity[0] + level.player.acceleration):
@@ -130,106 +136,7 @@ def process_game_events(pg_events, level, level_folder_name, display, HUD):
     level.player.world_position[0] += level.player.world_velocity[0]
     level.player.world_position[1] += level.player.world_velocity[1]
 
-    # level = apply_collision(level)
-    level = apply_collision_GPT(level)
-
-    # print(level.player.world_velocity)
-
-    return level, level_folder_name, display, HUD
-
-def apply_collision(level):
-    # works on the assumption that the player is less than 1 block wide and less than 2 blocks tall
-
-    pos = level.player.world_position
-    hitbox = level.player.hitbox
-    world_limits = level.block_ID_grid.shape
-    restore = [0, 0]
-    print("---------------------------\nplayer pos:", pos,"hitbox extent:",(pos[0]+hitbox[0],pos[1]-hitbox[1]))
-
-    for x in range(int(pos[0]),int(pos[0])+2):
-        for y in range(int(pos[1]),int(pos[1])+3):
-            print("AT:", (x, y))
-            if x >= 0 and x < world_limits[1] and y >=0 and y < world_limits[0]:
-                if level.block_ID_grid[y, x] != 0:
-                    print("CHECKING", (x, y))
-
-                    if (pos[0] + hitbox[0]) > x:
-                        print("valid horizontal check")
-
-                        if int(pos[1]) == y:
-                            restore[1] = (y+1) - pos[1]
-                            print("restore up")
-
-                        elif int(pos[1] + hitbox[1]) == y:
-                            restore[1] = y - (pos[1] + hitbox[1])
-                            print("restore down")
-
-                    if (pos[1] + hitbox[1]) > y:
-                        print("valid vertical check")
-
-                        if int(pos[0]) == x:
-                            restore[0] = (x+1) - pos[0]
-                            print("restore right")
-
-                        elif (pos[0] + hitbox[0]) > x:
-                            restore[0] = x - pos[0]
-                            print("restore left")
-
-
-
-    level.player.world_position[0] += restore[0]
-    level.player.world_position[1] += restore[1]
-
     return level
-
-def apply_collision_GPT(level):
-    world = level.block_ID_grid.transpose()
-    player_x, player_y = level.player.world_position
-    player_width, player_height = level.player.hitbox
-
-    # Calculate the bottom left and top right corners of the player's hitbox
-    player_left = player_x
-    player_right = player_x + player_width
-    player_bottom = player_y
-    player_top = player_y + player_height
-
-    # Initialize the offset to restore player's position
-    offset_x = 0.0
-    offset_y = 0.0
-
-    # Iterate through the blocks within the player's hitbox
-    for i in range(int(player_left), int(player_right) + 1):
-        for j in range(int(player_bottom), int(player_top) + 1):
-            # Check if the current block is within the world bounds
-            if i < 0 or i >= len(world) or j < 0 or j >= len(world[0]):
-                # Collision with world bounds, update offset_x and offset_y
-                if i < 0:
-                    offset_x = max(offset_x, abs(i) - player_left)
-                elif i >= len(world):
-                    offset_x = min(offset_x, len(world) - i - (player_right - player_x))
-                if j < 0:
-                    offset_y = max(offset_y, abs(j) - player_bottom)
-                elif j >= len(world[0]):
-                    offset_y = min(offset_y, len(world[0]) - j - (player_top - player_y))
-                continue
-
-            # Check if the current block is not empty (collision with a block)
-            if world[i][j] != 0:
-                # Collision with a block, update offset_x and offset_y
-                if i < player_x:
-                    offset_x = max(offset_x, abs(i + 1) - player_left)
-                elif i >= player_x + player_width:
-                    offset_x = min(offset_x, i - (player_right - player_x + 1))
-                if j < player_y:
-                    offset_y = max(offset_y, abs(j + 1) - player_bottom)
-                elif j >= player_y + player_height:
-                    offset_y = min(offset_y, j - (player_top - player_y + 1))
-
-    level.player.world_position[0] += offset_x
-    level.player.world_position[1] += offset_y
-
-    return level
-
 
 def load_level(level_folder,display):
 
