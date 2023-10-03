@@ -308,8 +308,11 @@ def act_on_button_press(button, editor, level, pg_events, level_name, display):
                         raise e
 
             elif button.name == "new_level":
-                new_level_name = input("Enter level folder name (default level_x ascending)\n==>: ")
-                save_changes(level, level_name, new_level_name)
+                new_level_name = input("Enter level folder name\n==>: ")
+                x_world_size = int(input("Enter level x size (int)\n==>: "))
+                y_world_size = int(input("Enter level y size (int)\n==>: "))
+                
+                new_level(new_level_name,x_world_size,y_world_size)
                 level = load_level(new_level_name, display)
                 level_name = new_level_name
 
@@ -333,9 +336,6 @@ def save_changes(level,level_folder,new_level_name):
             shutil.copy("levels\\"+level_folder+"\\"+item,os.getcwd()+"\\"+"levels\\"+new_level_name)
             print("copied:","levels\\"+level_folder+"\\"+item,"to:",os.getcwd()+"levels\\"+new_level_name)
 
-    with open("levels\\"+new_level_name+"\\block_dict.json", "w") as block_dict_file:
-        json.dump(level.block_dict,block_dict_file)
-
     np.save("levels\\"+new_level_name+"\\level_blocks_grid.npy", level.block_ID_grid)
     interactables_dict = dict([interactable.get_dict_item() for interactable in level.interactables])
     with open("levels\\"+new_level_name+"\\interactables_dict.json", "w") as interactables_dict_file:
@@ -343,8 +343,20 @@ def save_changes(level,level_folder,new_level_name):
 
     print("LEVEL SAVED")
 
-def new_level(new_level_name):
-    pass
+def new_level(new_level_name,x_world_size,y_world_size):
+    if not os.path.exists("levels\\" + new_level_name):
+        os.makedirs("levels\\" + new_level_name)
+        print("CREATED NEW FOLDER AT:",os.getcwd()+"levels\\" + new_level_name)
+
+    np.save("levels\\" + new_level_name + "\\level_blocks_grid.npy", np.zeros((x_world_size,y_world_size)).astype(np.uint8))
+    print("CREATED NEW WORLD BLOCK ARRAY WITH SIZE:",(x_world_size,y_world_size))
+    
+    with open("levels\\" + new_level_name + "\\interactables_dict.json", "w") as interactables_dict_file:
+        json.dump({}, interactables_dict_file)
+    print("CREATED NEW EMPTY INTERACTABLES DICT AT: "+os.getcwd()+"levels\\" + new_level_name + "\\interactables_dict.json")
+
+
+
 
 def STW(screen_position,display):
     x1 = screen_position[0]
