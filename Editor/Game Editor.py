@@ -166,7 +166,7 @@ def load_level(level_folder,display):
     level.block_ID_grid = np.load("levels\\"+level_folder+"\\level_blocks_grid.npy")
     level.block_screen_positions = get_block_screen_positions(level.block_ID_grid.shape,display)
 
-    with open("levels\\"+level_folder+"\\interactables_dict.json", "r") as interactables_file:
+    with open("levels\\"+level_folder+"\\level_interactables_dict.json", "r") as interactables_file:
         interactables_items= json.load(interactables_file).items()
 
     for interactable_item in interactables_items:
@@ -311,7 +311,7 @@ def act_on_button_press(button, editor, level, pg_events, level_name, display):
                 new_level_name = input("Enter level folder name\n==>: ")
                 x_world_size = int(input("Enter level x size (int)\n==>: "))
                 y_world_size = int(input("Enter level y size (int)\n==>: "))
-                
+
                 new_level(new_level_name,x_world_size,y_world_size)
                 level = load_level(new_level_name, display)
                 level_name = new_level_name
@@ -338,7 +338,7 @@ def save_changes(level,level_folder,new_level_name):
 
     np.save("levels\\"+new_level_name+"\\level_blocks_grid.npy", level.block_ID_grid)
     interactables_dict = dict([interactable.get_dict_item() for interactable in level.interactables])
-    with open("levels\\"+new_level_name+"\\interactables_dict.json", "w") as interactables_dict_file:
+    with open("levels\\"+new_level_name+"\\level_interactables_dict.json", "w") as interactables_dict_file:
         json.dump(interactables_dict, interactables_dict_file)
 
     print("LEVEL SAVED")
@@ -350,8 +350,8 @@ def new_level(new_level_name,x_world_size,y_world_size):
 
     np.save("levels\\" + new_level_name + "\\level_blocks_grid.npy", np.zeros((x_world_size,y_world_size)).astype(np.uint8))
     print("CREATED NEW WORLD BLOCK ARRAY WITH SIZE:",(x_world_size,y_world_size))
-    
-    with open("levels\\" + new_level_name + "\\interactables_dict.json", "w") as interactables_dict_file:
+
+    with open("levels\\" + new_level_name + "\\level_interactables_dict.json", "w") as interactables_dict_file:
         json.dump({}, interactables_dict_file)
     print("CREATED NEW EMPTY INTERACTABLES DICT AT: "+os.getcwd()+"levels\\" + new_level_name + "\\interactables_dict.json")
 
