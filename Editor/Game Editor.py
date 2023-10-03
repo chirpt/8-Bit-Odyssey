@@ -313,6 +313,7 @@ def act_on_button_press(button, editor, level, pg_events, level_name, display):
                 y_world_size = int(input("Enter level y size (int)\n==>: "))
 
                 new_level(new_level_name,x_world_size,y_world_size)
+                wait = input("add \"level_background.bmp\" and \"player_1.png\" to the new folder then press enter to load the new level\n")
                 level = load_level(new_level_name, display)
                 level_name = new_level_name
 
@@ -348,14 +349,17 @@ def new_level(new_level_name,x_world_size,y_world_size):
         os.makedirs("levels\\" + new_level_name)
         print("CREATED NEW FOLDER AT:",os.getcwd()+"levels\\" + new_level_name)
 
-    np.save("levels\\" + new_level_name + "\\level_blocks_grid.npy", np.zeros((x_world_size,y_world_size)).astype(np.uint8))
+    np.save("levels\\" + new_level_name + "\\level_blocks_grid.npy", np.zeros((y_world_size, x_world_size)).astype(np.uint8))
     print("CREATED NEW WORLD BLOCK ARRAY WITH SIZE:",(x_world_size,y_world_size))
 
     with open("levels\\" + new_level_name + "\\level_interactables_dict.json", "w") as interactables_dict_file:
         json.dump({}, interactables_dict_file)
     print("CREATED NEW EMPTY INTERACTABLES DICT AT: "+os.getcwd()+"levels\\" + new_level_name + "\\interactables_dict.json")
 
-
+    default_player_info = {"position": [0.5, 8.5], "animation": None, "image_filename": "player_1.png", "inventory": {"carrot": 10, "diamond_hoe": 1},"velocity":[0,0],"hitbox":[0.8,1.7],"acceleration":0.01,"max_velocity":[0.1	,10]}
+    with open("levels\\" + new_level_name + "\\player_info.json", "w") as interactables_dict_file:
+        json.dump(default_player_info, interactables_dict_file)
+    print("CREATED NEW DEFAULT PLAYER INFO DICT AT: "+os.getcwd()+"levels\\" + new_level_name + "\\player_info.json")
 
 
 def STW(screen_position,display):
