@@ -306,6 +306,12 @@ def act_on_button_press(button, editor, level, pg_events, level_name, display):
                     except Exception as e:
                         print("\""+str(level_name)+"\" could not be loaded successfully. Check folder format is compatible.")
                         raise e
+                    
+            elif button.name == "new_level":
+                new_level_name = input("Enter level folder name (default level_x ascending)\n==>: ")
+                save_changes(level, level_name, new_level_name)
+                level = load_level(new_level_name, display)
+                level_name = new_level_name
 
     if pg_events["mouse_pressed"][0]:
         if button.name[0:11] == "block_place":
@@ -321,22 +327,24 @@ def render(editor, level, display, level_name):
     pygame.display.update()
 def save_changes(level,level_folder,new_level_name):
 
-    if not os.path.exists(new_level_name):
-        os.makedirs(new_level_name)
+    if not os.path.exists("levels\\"+new_level_name):
+        os.makedirs("levels\\"+new_level_name)
         for item in os.listdir("levels\\"+level_folder):
-            shutil.copy("levels\\"+level_folder+"\\"+item,os.getcwd()+"\\"+new_level_name)
-            print("copied:","levels\\"+level_folder+"\\"+item,"to:",os.getcwd()+new_level_name)
+            shutil.copy("levels\\"+level_folder+"\\"+item,os.getcwd()+"\\"+"levels\\"+new_level_name)
+            print("copied:","levels\\"+level_folder+"\\"+item,"to:",os.getcwd()+"levels\\"+new_level_name)
 
-    with open(new_level_name+"\\block_dict.json", "w") as block_dict_file:
+    with open("levels\\"+new_level_name+"\\block_dict.json", "w") as block_dict_file:
         json.dump(level.block_dict,block_dict_file)
 
-    np.save(new_level_name+"\\level_blocks_grid.npy", level.block_ID_grid)
+    np.save("levels\\"+new_level_name+"\\level_blocks_grid.npy", level.block_ID_grid)
     interactables_dict = dict([interactable.get_dict_item() for interactable in level.interactables])
-    with open(new_level_name+"\\interactables_dict.json", "w") as interactables_dict_file:
+    with open("levels\\"+new_level_name+"\\interactables_dict.json", "w") as interactables_dict_file:
         json.dump(interactables_dict, interactables_dict_file)
 
     print("LEVEL SAVED")
 
+def new_level(new_level_name):
+    pass
 
 def STW(screen_position,display):
     x1 = screen_position[0]
