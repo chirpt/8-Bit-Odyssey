@@ -306,7 +306,7 @@ def act_on_button_press(button, editor, level, pg_events, level_name, display):
                     except Exception as e:
                         print("\""+str(level_name)+"\" could not be loaded successfully. Check folder format is compatible.")
                         raise e
-                    
+
             elif button.name == "new_level":
                 new_level_name = input("Enter level folder name (default level_x ascending)\n==>: ")
                 save_changes(level, level_name, new_level_name)
